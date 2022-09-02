@@ -16,17 +16,17 @@ import org.glassfish.jaxb.core.v2.model.core.EnumLeafInfo;
 /**
  * @author Kohsuke Kawaguchi
  */
-class EnumConstantImpl<T,C,F,M> implements EnumConstant<T,C> {
+class EnumConstantImpl<T,C,F,M,R> implements EnumConstant<T,C> {
     protected final String lexical;
-    protected final EnumLeafInfoImpl<T,C,F,M> owner;
+    protected final EnumLeafInfoImpl<T,C,F,M,R> owner;
     protected final String name;
 
     /**
      * All the constants of the {@link EnumConstantImpl} is linked in one list.
      */
-    protected final EnumConstantImpl<T,C,F,M> next;
+    protected final EnumConstantImpl<T,C,F,M,R> next;
 
-    public EnumConstantImpl(EnumLeafInfoImpl<T,C,F,M> owner, String name, String lexical, EnumConstantImpl<T,C,F,M> next) {
+    public EnumConstantImpl(EnumLeafInfoImpl<T,C,F,M,R> owner, String name, String lexical, EnumConstantImpl<T,C,F,M,R> next) {
         this.lexical = lexical;
         this.owner = owner;
         this.name = name;

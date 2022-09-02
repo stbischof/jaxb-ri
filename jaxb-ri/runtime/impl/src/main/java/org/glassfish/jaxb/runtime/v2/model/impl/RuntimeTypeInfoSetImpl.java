@@ -26,8 +26,8 @@ import java.util.Map;
  *
  * @author Kohsuke Kawaguchi
  */
-final class RuntimeTypeInfoSetImpl extends TypeInfoSetImpl<Type,Class,Field,Method> implements RuntimeTypeInfoSet {
-    public RuntimeTypeInfoSetImpl(AnnotationReader<Type,Class,Field,Method> reader) {
+final class RuntimeTypeInfoSetImpl extends TypeInfoSetImpl<Type,Class,Field,Method,Object> implements RuntimeTypeInfoSet {
+    public RuntimeTypeInfoSetImpl(AnnotationReader<Type,Class,Field,Method,Object> reader) {
         super(Utils.REFLECTION_NAVIGATOR,reader,RuntimeBuiltinLeafInfoImpl.LEAVES);
     }
 

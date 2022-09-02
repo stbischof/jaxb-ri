@@ -10,50 +10,60 @@
 
 package org.glassfish.jaxb.runtime.v2.model.impl;
 
-import com.sun.istack.NotNull;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+
 import org.glassfish.jaxb.core.annotation.XmlLocation;
+import org.glassfish.jaxb.core.v2.ClassFactory;
+import org.glassfish.jaxb.core.v2.model.annotation.Locatable;
 import org.glassfish.jaxb.core.v2.model.core.AttributePropertyInfo;
 import org.glassfish.jaxb.core.v2.model.core.ElementPropertyInfo;
 import org.glassfish.jaxb.core.v2.model.core.MapPropertyInfo;
+import org.glassfish.jaxb.core.v2.model.core.PropertyKind;
 import org.glassfish.jaxb.core.v2.model.core.ReferencePropertyInfo;
 import org.glassfish.jaxb.core.v2.model.core.ValuePropertyInfo;
+import org.glassfish.jaxb.core.v2.runtime.IllegalAnnotationException;
+import org.glassfish.jaxb.core.v2.runtime.Location;
+import org.glassfish.jaxb.core.v2.util.RecordComponentProxy;
 import org.glassfish.jaxb.runtime.AccessorFactory;
 import org.glassfish.jaxb.runtime.AccessorFactoryImpl;
 import org.glassfish.jaxb.runtime.InternalAccessorFactory;
 import org.glassfish.jaxb.runtime.XmlAccessorFactory;
 import org.glassfish.jaxb.runtime.api.AccessorException;
-import org.glassfish.jaxb.runtime.v2.runtime.JAXBContextImpl;
-import org.glassfish.jaxb.runtime.v2.runtime.Name;
-import org.glassfish.jaxb.runtime.v2.runtime.Transducer;
-import org.glassfish.jaxb.runtime.v2.runtime.XMLSerializer;
-import org.glassfish.jaxb.core.v2.ClassFactory;
-import org.glassfish.jaxb.core.v2.model.annotation.Locatable;
-import org.glassfish.jaxb.core.v2.model.core.PropertyKind;
 import org.glassfish.jaxb.runtime.v2.model.runtime.RuntimeClassInfo;
 import org.glassfish.jaxb.runtime.v2.model.runtime.RuntimeElement;
 import org.glassfish.jaxb.runtime.v2.model.runtime.RuntimePropertyInfo;
 import org.glassfish.jaxb.runtime.v2.model.runtime.RuntimeValuePropertyInfo;
-import org.glassfish.jaxb.core.v2.runtime.IllegalAnnotationException;
-import org.glassfish.jaxb.core.v2.runtime.Location;
+import org.glassfish.jaxb.runtime.v2.runtime.JAXBContextImpl;
+import org.glassfish.jaxb.runtime.v2.runtime.Name;
+import org.glassfish.jaxb.runtime.v2.runtime.RecordBuilder;
+import org.glassfish.jaxb.runtime.v2.runtime.Transducer;
+import org.glassfish.jaxb.runtime.v2.runtime.XMLSerializer;
 import org.glassfish.jaxb.runtime.v2.runtime.reflect.Accessor;
 import org.glassfish.jaxb.runtime.v2.runtime.reflect.TransducedAccessor;
 import org.glassfish.jaxb.runtime.v2.runtime.unmarshaller.UnmarshallingContext;
-import jakarta.xml.bind.JAXBException;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.List;
-import java.util.Map;
+import com.sun.istack.NotNull;
+
+import jakarta.xml.bind.JAXBException;
 
 /**
  * @author Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-class RuntimeClassInfoImpl extends ClassInfoImpl<Type,Class,Field,Method>
+class RuntimeClassInfoImpl extends ClassInfoImpl<Type,Class,Field,Method,Object>
         implements RuntimeClassInfo, RuntimeElement {
 
     /**
@@ -128,27 +138,27 @@ class RuntimeClassInfoImpl extends ClassInfoImpl<Type,Class,Field,Method>
     }
 
     @Override
-    protected ReferencePropertyInfo<Type,Class> createReferenceProperty(PropertySeed<Type,Class,Field,Method> seed) {
+    protected ReferencePropertyInfo<Type,Class> createReferenceProperty(PropertySeed<Type,Class,Field,Method,Object> seed) {
         return new RuntimeReferencePropertyInfoImpl(this,seed);
     }
 
     @Override
-    protected AttributePropertyInfo<Type,Class> createAttributeProperty(PropertySeed<Type,Class,Field,Method> seed) {
+    protected AttributePropertyInfo<Type,Class> createAttributeProperty(PropertySeed<Type,Class,Field,Method,Object> seed) {
         return new RuntimeAttributePropertyInfoImpl(this,seed);
     }
 
     @Override
-    protected ValuePropertyInfo<Type,Class> createValueProperty(PropertySeed<Type,Class,Field,Method> seed) {
+    protected ValuePropertyInfo<Type,Class> createValueProperty(PropertySeed<Type,Class,Field,Method,Object> seed) {
         return new RuntimeValuePropertyInfoImpl(this,seed);
     }
 
     @Override
-    protected ElementPropertyInfo<Type,Class> createElementProperty(PropertySeed<Type,Class,Field,Method> seed) {
+    protected ElementPropertyInfo<Type,Class> createElementProperty(PropertySeed<Type,Class,Field,Method,Object> seed) {
         return new RuntimeElementPropertyInfoImpl(this,seed);
     }
 
     @Override
-    protected MapPropertyInfo<Type,Class> createMapProperty(PropertySeed<Type,Class,Field,Method> seed) {
+    protected MapPropertyInfo<Type,Class> createMapProperty(PropertySeed<Type,Class,Field,Method,Object> seed) {
         return new RuntimeMapPropertyInfoImpl(this,seed);
     }
 
@@ -249,6 +259,34 @@ class RuntimeClassInfoImpl extends ClassInfoImpl<Type,Class,Field,Method>
         }
         return new RuntimePropertySeed(super.createFieldSeed(field), acc );
     }
+    
+    
+	@Override
+	protected PropertySeed<Type, Class, Field, Method, Object> createRecordComponentSeed(Object rc) {
+
+		RecordComponentProxy r = (RecordComponentProxy) rc;
+		Accessor acc = new Accessor(clazz) {
+			Map<RecordComponentProxy, Object> store = new HashMap<>();
+
+			@Override
+			public Object get(Object bean) throws AccessorException {
+				try {
+					return r.getAccessor().invoke(bean);
+				} catch (Exception e) {
+					throw new AccessorException(e);
+				}
+			}
+
+			@Override
+			public void set(Object bean, Object value) throws AccessorException {
+				((RecordBuilder) bean).add(r, value);
+				System.out.println("fooooo" + bean + value);
+			}
+		};
+
+		return new RuntimePropertySeed(super.createRecordComponentSeed(rc), acc);
+
+	}
 
     @Override
     public RuntimePropertySeed createAccessorSeed(Method getter, Method setter) {
@@ -278,15 +316,15 @@ class RuntimeClassInfoImpl extends ClassInfoImpl<Type,Class,Field,Method>
         return xmlLocationAccessor;
     }
 
-    static final class RuntimePropertySeed implements PropertySeed<Type,Class,Field,Method> {
+    static final class RuntimePropertySeed implements PropertySeed<Type,Class,Field,Method,Object> {
         /**
          * @see #getAccessor()
          */
         private final Accessor acc;
 
-        private final PropertySeed<Type,Class,Field,Method> core;
+        private final PropertySeed<Type,Class,Field,Method,Object> core;
 
-        public RuntimePropertySeed(PropertySeed<Type,Class,Field,Method> core, Accessor acc) {
+        public RuntimePropertySeed(PropertySeed<Type,Class,Field,Method,Object> core, Accessor acc) {
             this.core = core;
             this.acc = acc;
         }

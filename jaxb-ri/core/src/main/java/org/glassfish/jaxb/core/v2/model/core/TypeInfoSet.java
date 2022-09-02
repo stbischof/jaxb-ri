@@ -25,19 +25,19 @@ import org.glassfish.jaxb.core.v2.model.nav.Navigator;
  *
  * @author Kohsuke Kawaguchi
  */
-public interface TypeInfoSet<T,C,F,M> {
+public interface TypeInfoSet<T,C,F,M,R> {
 
     /**
      * {@link Navigator} for this model.
      */
-    Navigator<T,C,F,M> getNavigator();
+    Navigator<T,C,F,M,R> getNavigator();
 
 //  turns out we can't have AnnotationReader in XJC, so it's impossible to have this here.
 //  perhaps we should revisit this in the future.
 //    /**
 //     * {@link AnnotationReader} for this model.
 //     */
-//    AnnotationReader<T,C,F,M> getReader();
+//    AnnotationReader<T,C,F,M,R> getReader();
 
     /**
      * Returns a {@link TypeInfo} for the given type.

@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
  *
  * @author Kohsuke Kawaguchi
  */
-abstract class TypeInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
+abstract class TypeInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT>
         implements TypeInfo<TypeT,ClassDeclT>, Locatable {
 
     /**
@@ -40,16 +40,16 @@ abstract class TypeInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
     /**
      * {@link TypeInfoSet} to which this class belongs.
      */
-    protected final TypeInfoSetImpl<TypeT,ClassDeclT,FieldT,MethodT> owner;
+    protected final TypeInfoSetImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> owner;
 
     /**
      * Reference to the {@link ModelBuilder}, only until we link {@link TypeInfo}s all together,
      * because we don't want to keep {@link ModelBuilder} too long.
      */
-    protected ModelBuilder<TypeT,ClassDeclT,FieldT,MethodT> builder;
+    protected ModelBuilder<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> builder;
 
     protected TypeInfoImpl(
-        ModelBuilder<TypeT,ClassDeclT,FieldT,MethodT> builder,
+        ModelBuilder<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> builder,
         Locatable upstream) {
 
         this.builder = builder;
@@ -66,11 +66,11 @@ abstract class TypeInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
         builder = null;
     }
 
-    protected final Navigator<TypeT,ClassDeclT,FieldT,MethodT> nav() {
+    protected final Navigator<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> nav() {
         return owner.nav;
     }
 
-    protected final AnnotationReader<TypeT,ClassDeclT,FieldT,MethodT> reader() {
+    protected final AnnotationReader<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> reader() {
         return owner.reader;
     }
 

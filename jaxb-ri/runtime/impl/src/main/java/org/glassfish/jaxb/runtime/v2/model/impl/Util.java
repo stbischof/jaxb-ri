@@ -28,8 +28,8 @@ import javax.xml.namespace.QName;
  * @author Kohsuke Kawaguchi
  */
 final class Util {
-    static <T,C,F,M> QName calcSchemaType(
-            AnnotationReader<T,C,F,M> reader,
+    static <T,C,F,M,R> QName calcSchemaType(
+            AnnotationReader<T,C,F,M,R> reader,
             AnnotationSource primarySource, C enclosingClass, T individualType, Locatable src ) {
 
         XmlSchemaType xst = primarySource.readAnnotation(XmlSchemaType.class);

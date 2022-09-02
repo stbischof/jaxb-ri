@@ -27,9 +27,9 @@ import javax.xml.namespace.QName;
 class AnyTypeImpl<T,C> implements NonElement<T,C> {
 
     private final T type;
-    private final Navigator<T,C,?,?> nav;
+    private final Navigator<T,C,?,?,?> nav;
 
-    public AnyTypeImpl(Navigator<T,C,?,?> nav) {
+    public AnyTypeImpl(Navigator<T,C,?,?,?> nav) {
         this.type = nav.ref(Object.class);
         this.nav = nav;
     }

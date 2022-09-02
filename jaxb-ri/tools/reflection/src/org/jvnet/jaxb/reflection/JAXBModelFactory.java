@@ -51,13 +51,13 @@ public abstract class JAXBModelFactory {
      *      null if any error was reported during the processing.
      *      If no error is reported, a non-null valid object.
      */
-    public static <T,C,F,M> TypeInfoSet<T,C,F,M> create(
-        AnnotationReader<T,C,F,M> reader,
-        Navigator<T,C,F,M> navigator,
+    public static <T,C,F,M,R> TypeInfoSet<T,C,F,M,R> create(
+        AnnotationReader<T,C,F,M,R> reader,
+        Navigator<T,C,F,M,R> navigator,
         ErrorHandler errorHandler,
         Collection<C> classes ) {
 
-        ModelBuilder<T,C,F,M> builder = new ModelBuilder<T,C,F,M>(reader,navigator,Collections.<C,C>emptyMap(),null);
+        ModelBuilder<T,C,F,M,R> builder = new ModelBuilder<T,C,F,M,R>(reader,navigator,Collections.<C,C>emptyMap(),null);
         builder.setErrorHandler(errorHandler);
         for( C c : classes )
             builder.getTypeInfo(new Ref<T,C>(navigator.use(c)));

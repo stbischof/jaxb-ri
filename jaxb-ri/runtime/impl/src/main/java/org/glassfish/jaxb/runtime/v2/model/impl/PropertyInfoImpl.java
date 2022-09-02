@@ -33,13 +33,13 @@ import java.util.Collection;
  *
  * @author Kohsuke Kawaguchi
  */
-abstract class PropertyInfoImpl<T,C,F,M>
-    implements PropertyInfo<T,C>, Locatable, Comparable<PropertyInfoImpl<T,C,F,M>> /*by their names*/ {
+abstract class PropertyInfoImpl<T,C,F,M,R>
+    implements PropertyInfo<T,C>, Locatable, Comparable<PropertyInfoImpl<T,C,F,M,R>> /*by their names*/ {
 
     /**
      * Object that reads annotations.
      */
-    protected final PropertySeed<T,C,F,M> seed;
+    protected final PropertySeed<T,C,F,M,R> seed;
 
     private final boolean isCollection;
 
@@ -49,11 +49,11 @@ abstract class PropertyInfoImpl<T,C,F,M>
     private final boolean inlineBinary;
     private final QName schemaType;
 
-    protected final ClassInfoImpl<T,C,F,M> parent;
+    protected final ClassInfoImpl<T,C,F,M,R> parent;
 
     private final Adapter<T,C> adapter;
 
-    protected PropertyInfoImpl(ClassInfoImpl<T,C,F,M> parent, PropertySeed<T,C,F,M> spi) {
+    protected PropertyInfoImpl(ClassInfoImpl<T,C,F,M,R> parent, PropertySeed<T,C,F,M,R> spi) {
         this.seed = spi;
         this.parent = parent;
 
@@ -125,14 +125,14 @@ abstract class PropertyInfoImpl<T,C,F,M>
 
 
     @Override
-    public ClassInfoImpl<T,C,F,M> parent() {
+    public ClassInfoImpl<T,C,F,M,R> parent() {
         return parent;
     }
 
-    protected final Navigator<T,C,F,M> nav() {
+    protected final Navigator<T,C,F,M,R> nav() {
         return parent.nav();
     }
-    protected final AnnotationReader<T,C,F,M> reader() {
+    protected final AnnotationReader<T,C,F,M,R> reader() {
         return parent.reader();
     }
 
@@ -357,7 +357,7 @@ abstract class PropertyInfoImpl<T,C,F,M>
     }
 
     @Override
-    public int compareTo(PropertyInfoImpl<T,C,F,M> that) {
+    public int compareTo(PropertyInfoImpl<T,C,F,M,R> that) {
         return this.getName().compareTo(that.getName());
     }
 

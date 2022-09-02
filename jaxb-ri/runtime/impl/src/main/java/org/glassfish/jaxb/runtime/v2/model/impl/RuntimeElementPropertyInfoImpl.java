@@ -23,19 +23,28 @@ import java.util.List;
 /**
  * @author Kohsuke Kawaguchi
  */
-class RuntimeElementPropertyInfoImpl extends ElementPropertyInfoImpl<Type,Class,Field,Method>
+class RuntimeElementPropertyInfoImpl extends ElementPropertyInfoImpl<Type,Class,Field,Method,Object>
     implements RuntimeElementPropertyInfo {
 
     private final Accessor acc;
 
-    RuntimeElementPropertyInfoImpl(RuntimeClassInfoImpl classInfo, PropertySeed<Type,Class,Field,Method> seed) {
+    RuntimeElementPropertyInfoImpl(RuntimeClassInfoImpl classInfo, PropertySeed<Type,Class,Field,Method,Object> seed) {
         super(classInfo, seed);
+        
+        if(seed instanceof RuntimeClassInfoImpl.RuntimePropertySeed ) {
+        	
         Accessor rawAcc = ((RuntimeClassInfoImpl.RuntimePropertySeed)seed).getAccessor();
         if(getAdapter()!=null && !isCollection())
             // adapter for a single-value property is handled by accessor.
             // adapter for a collection property is handled by lister.
             rawAcc = rawAcc.adapt(getAdapter());
         this.acc = rawAcc;
+        }else{
+        	acc=null;
+        	return;
+        }
+        	
+
     }
 
     @Override

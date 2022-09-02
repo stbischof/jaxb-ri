@@ -10,8 +10,6 @@
 
 package org.glassfish.jaxb.runtime.v2.model.annotation;
 
-import org.glassfish.jaxb.core.v2.model.annotation.Locatable;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -20,13 +18,16 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.glassfish.jaxb.core.v2.model.annotation.Locatable;
+import org.glassfish.jaxb.core.v2.util.RecordComponentProxy;
+
 /**
  * {@link org.glassfish.jaxb.core.v2.model.annotation.AnnotationReader} that uses {@code java.lang.reflect} to
  * read annotations from class files.
  *
  * @author Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public final class RuntimeInlineAnnotationReader extends AbstractInlineAnnotationReaderImpl<Type,Class,Field,Method>
+public final class RuntimeInlineAnnotationReader extends AbstractInlineAnnotationReaderImpl<Type,Class,Field,Method,Object>
     implements RuntimeAnnotationReader {
 
     /**
@@ -149,4 +150,21 @@ public final class RuntimeInlineAnnotationReader extends AbstractInlineAnnotatio
     protected String fullName(Method m) {
         return m.getDeclaringClass().getName()+'#'+m.getName();
     }
+
+	@Override
+	public <A extends Annotation> A getRecordComponentAnnotation(Class<A> annotation, Object rc, Locatable srcpos) {
+        return LocatableAnnotation.create(((RecordComponentProxy) rc).getAnnotation(annotation),srcpos);
+
+	}
+
+	@Override
+	public Annotation[] getAllRecordComponentAnnotations(Object recordComponent, Locatable srcPos) {
+		return ((RecordComponentProxy) recordComponent).getAnnotations();
+	}
+
+	@Override
+	public boolean hasRecordComponentAnnotation(Class<? extends Annotation> annotationType, Object rc) {
+		return ((RecordComponentProxy) rc).getAnnotation(annotationType)!=null;
+
+	}
 }

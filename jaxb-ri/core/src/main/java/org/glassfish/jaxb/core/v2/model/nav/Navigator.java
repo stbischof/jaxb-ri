@@ -41,7 +41,7 @@ import org.glassfish.jaxb.core.v2.runtime.Location;
  *
  * @author Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public interface Navigator<T,C,F,M> {
+public interface Navigator<T,C,F,M,R> {
     /**
      * Gets the base class of the specified class.
      *
@@ -386,4 +386,17 @@ public interface Navigator<T,C,F,M> {
      * @return true if types are the same
      */
     boolean isSameType(T t1, T t2);
+
+    /**
+     * Returns true if the given class is a record.
+     */
+	boolean isRecord(C clazz);
+
+	R[] getRecordComponents(C c);
+
+	String getRecordComponentName(R rc);
+
+	T getRecordComponentType(R rc);
+
+	Location getRecordComponentLocation(R rc);
 }

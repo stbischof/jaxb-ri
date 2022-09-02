@@ -37,13 +37,13 @@ import java.util.*;
  *
  * @author Kohsuke Kawaguchi
  */
-class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
+class TypeInfoSetImpl<T,C,F,M,R> implements TypeInfoSet<T,C,F,M,R> {
 
     @XmlTransient
-    public final Navigator<T,C,F,M> nav;
+    public final Navigator<T,C,F,M,R> nav;
 
     @XmlTransient
-    public final AnnotationReader<T,C,F,M> reader;
+    public final AnnotationReader<T,C,F,M,R> reader;
 
     /**
      * All the leaves.
@@ -52,11 +52,11 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
             new LinkedHashMap<>();
 
     /** All {@link EnumLeafInfoImpl}s. */
-    private final Map<C,EnumLeafInfoImpl<T,C,F,M>> enums =
+    private final Map<C,EnumLeafInfoImpl<T,C,F,M,R>> enums =
             new LinkedHashMap<>();
 
     /** All {@link ArrayInfoImpl}s. */
-    private final Map<T,ArrayInfoImpl<T,C,F,M>> arrays =
+    private final Map<T,ArrayInfoImpl<T,C,F,M,R>> arrays =
             new LinkedHashMap<>();
 
     /**
@@ -68,23 +68,23 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
      * an error to be reported on a class closer to the user's code.
      */
     @XmlJavaTypeAdapter(RuntimeUtil.ToStringAdapter.class)
-    private final Map<C,ClassInfoImpl<T,C,F,M>> beans
+    private final Map<C,ClassInfoImpl<T,C,F,M,R>> beans
             = new LinkedHashMap<>();
 
     @XmlTransient
-    private final Map<C,ClassInfoImpl<T,C,F,M>> beansView =
+    private final Map<C,ClassInfoImpl<T,C,F,M,R>> beansView =
         Collections.unmodifiableMap(beans);
 
     /**
      * The element mapping.
      */
-    private final Map<C,Map<QName,ElementInfoImpl<T,C,F,M>>> elementMappings =
+    private final Map<C,Map<QName,ElementInfoImpl<T,C,F,M,R>>> elementMappings =
         new LinkedHashMap<>();
     
-    private final Iterable<? extends ElementInfoImpl<T,C,F,M>> allElements =
+    private final Iterable<? extends ElementInfoImpl<T,C,F,M,R>> allElements =
             new Iterable<>() {
                 @Override
-                public Iterator<ElementInfoImpl<T, C, F, M>> iterator() {
+                public Iterator<ElementInfoImpl<T, C, F, M,R>> iterator() {
                     return new FlattenIterator<>(elementMappings.values());
                 }
             };
@@ -104,8 +104,8 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
      */
     private Map<String,Map<String,String>> xmlNsCache;
 
-    public TypeInfoSetImpl(Navigator<T,C,F,M> nav,
-                           AnnotationReader<T,C,F,M> reader,
+    public TypeInfoSetImpl(Navigator<T,C,F,M,R> nav,
+                           AnnotationReader<T,C,F,M,R> reader,
                            Map<T,? extends BuiltinLeafInfoImpl<T,C>> leaves) {
         this.nav = nav;
         this.reader = reader;
@@ -127,25 +127,25 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
     }
 
     @Override
-    public Navigator<T,C,F,M> getNavigator() {
+    public Navigator<T,C,F,M,R> getNavigator() {
         return nav;
     }
 
     /**
      * Adds a new {@link ClassInfo} to the set.
      */
-    public void add( ClassInfoImpl<T,C,F,M> ci ) {
+    public void add( ClassInfoImpl<T,C,F,M,R> ci ) {
         beans.put( ci.getClazz(), ci );
     }
 
     /**
      * Adds a new {@link LeafInfo} to the set.
      */
-    public void add( EnumLeafInfoImpl<T,C,F,M> li ) {
+    public void add( EnumLeafInfoImpl<T,C,F,M,R> li ) {
         enums.put( li.clazz,  li );
     }
 
-    public void add(ArrayInfoImpl<T, C, F, M> ai) {
+    public void add(ArrayInfoImpl<T, C, F, M, R> ai) {
         arrays.put( ai.getType(), ai );
     }
 
@@ -195,7 +195,7 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
      * Returns all the {@link ClassInfo}s known to this set.
      */
     @Override
-    public Map<C,? extends ClassInfoImpl<T,C,F,M>> beans() {
+    public Map<C,? extends ClassInfoImpl<T,C,F,M,R>> beans() {
         return beansView;
     }
 
@@ -205,12 +205,12 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
     }
 
     @Override
-    public Map<C, ? extends EnumLeafInfoImpl<T,C,F,M>> enums() {
+    public Map<C, ? extends EnumLeafInfoImpl<T,C,F,M,R>> enums() {
         return enums;
     }
 
     @Override
-    public Map<? extends T, ? extends ArrayInfoImpl<T,C,F,M>> arrays() {
+    public Map<? extends T, ? extends ArrayInfoImpl<T,C,F,M,R>> arrays() {
         return arrays;
     }
 
@@ -240,11 +240,11 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
     }
 
     @Override
-    public ElementInfoImpl<T,C,F,M> getElementInfo( C scope, QName name ) {
+    public ElementInfoImpl<T,C,F,M,R> getElementInfo( C scope, QName name ) {
         while(scope!=null) {
-            Map<QName,ElementInfoImpl<T,C,F,M>> m = elementMappings.get(scope);
+            Map<QName,ElementInfoImpl<T,C,F,M,R>> m = elementMappings.get(scope);
             if(m!=null) {
-                ElementInfoImpl<T,C,F,M> r = m.get(name);
+                ElementInfoImpl<T,C,F,M,R> r = m.get(name);
                 if(r!=null)     return r;
             }
             scope = nav.getSuperClass(scope);
@@ -256,14 +256,14 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
      * @param builder
      *      used for reporting errors.
      */
-    public final void add( ElementInfoImpl<T,C,F,M> ei, ModelBuilder<T,C,F,M> builder ) {
+    public final void add( ElementInfoImpl<T,C,F,M,R> ei, ModelBuilder<T,C,F,M,R> builder ) {
         C scope = null;
         if(ei.getScope()!=null)
             scope = ei.getScope().getClazz();
 
-        Map<QName, ElementInfoImpl<T, C, F, M>> m = elementMappings.computeIfAbsent(scope, k -> new LinkedHashMap<>());
+        Map<QName, ElementInfoImpl<T, C, F, M, R>> m = elementMappings.computeIfAbsent(scope, k -> new LinkedHashMap<>());
 
-        ElementInfoImpl<T,C,F,M> existing = m.put(ei.getElementName(),ei);
+        ElementInfoImpl<T,C,F,M,R> existing = m.put(ei.getElementName(),ei);
 
         if(existing!=null) {
             QName en = ei.getElementName();
@@ -275,12 +275,12 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
     }
 
     @Override
-    public Map<QName,? extends ElementInfoImpl<T,C,F,M>> getElementMappings( C scope ) {
+    public Map<QName,? extends ElementInfoImpl<T,C,F,M,R>> getElementMappings( C scope ) {
         return elementMappings.get(scope);
     }
 
     @Override
-    public Iterable<? extends ElementInfoImpl<T,C,F,M>> getAllElements() {
+    public Iterable<? extends ElementInfoImpl<T,C,F,M,R>> getAllElements() {
         return allElements;
     }
 
@@ -289,7 +289,7 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
         if(xmlNsCache==null) {
             xmlNsCache = new HashMap<>();
 
-            for (ClassInfoImpl<T, C, F, M> ci : beans().values()) {
+            for (ClassInfoImpl<T, C, F, M, R> ci : beans().values()) {
                 XmlSchema xs = reader.getPackageAnnotation( XmlSchema.class, ci.getClazz(), null );
                 if(xs==null)
                     continue;
@@ -311,7 +311,7 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
     @Override
     public Map<String,String> getSchemaLocations() {
         Map<String, String> r = new HashMap<>();
-        for (ClassInfoImpl<T, C, F, M> ci : beans().values()) {
+        for (ClassInfoImpl<T, C, F, M, R> ci : beans().values()) {
             XmlSchema xs = reader.getPackageAnnotation( XmlSchema.class, ci.getClazz(), null );
             if(xs==null)
                 continue;
@@ -327,7 +327,7 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
 
     @Override
     public final XmlNsForm getElementFormDefault(String nsUri) {
-        for (ClassInfoImpl<T, C, F, M> ci : beans().values()) {
+        for (ClassInfoImpl<T, C, F, M, R> ci : beans().values()) {
             XmlSchema xs = reader.getPackageAnnotation( XmlSchema.class, ci.getClazz(), null );
             if(xs==null)
                 continue;
@@ -344,7 +344,7 @@ class TypeInfoSetImpl<T,C,F,M> implements TypeInfoSet<T,C,F,M> {
 
     @Override
     public final XmlNsForm getAttributeFormDefault(String nsUri) {
-        for (ClassInfoImpl<T,C,F,M> ci : beans().values()) {
+        for (ClassInfoImpl<T,C,F,M,R> ci : beans().values()) {
             XmlSchema xs = reader.getPackageAnnotation( XmlSchema.class, ci.getClazz(), null );
             if(xs==null)
                 continue;

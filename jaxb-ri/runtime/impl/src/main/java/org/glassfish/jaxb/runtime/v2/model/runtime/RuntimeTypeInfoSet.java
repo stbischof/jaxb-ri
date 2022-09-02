@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * @author Kohsuke Kawaguchi
  */
-public interface RuntimeTypeInfoSet extends TypeInfoSet<Type,Class,Field,Method>{
+public interface RuntimeTypeInfoSet extends TypeInfoSet<Type,Class,Field,Method,Object>{
     @Override
     Map<Class,? extends RuntimeArrayInfo> arrays();
     @Override

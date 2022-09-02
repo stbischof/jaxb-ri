@@ -22,12 +22,12 @@ import javax.xml.namespace.QName;
 class TypeRefImpl<TypeT,ClassDeclT> implements TypeRef<TypeT,ClassDeclT> {
     private final QName elementName;
     private final TypeT type;
-    protected final ElementPropertyInfoImpl<TypeT,ClassDeclT,?,?> owner;
+    protected final ElementPropertyInfoImpl<TypeT,ClassDeclT,?,?,?> owner;
     private NonElement<TypeT,ClassDeclT> ref;
     private final boolean isNillable;
     private String defaultValue;
 
-    public TypeRefImpl(ElementPropertyInfoImpl<TypeT, ClassDeclT, ?, ?> owner, QName elementName, TypeT type, boolean isNillable, String defaultValue) {
+    public TypeRefImpl(ElementPropertyInfoImpl<TypeT, ClassDeclT, ?, ?, ?> owner, QName elementName, TypeT type, boolean isNillable, String defaultValue) {
         this.owner = owner;
         this.elementName = elementName;
         this.type = type;

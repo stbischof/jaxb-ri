@@ -28,8 +28,8 @@ import java.util.List;
  * 
  * @author Kohsuke Kawaguchi
  */
-class ElementPropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
-    extends ERPropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
+class ElementPropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT>
+    extends ERPropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT>
     implements ElementPropertyInfo<TypeT,ClassDeclT>
 {
     /**
@@ -62,8 +62,8 @@ class ElementPropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
     private final boolean isValueList;
 
     ElementPropertyInfoImpl(
-        ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT> parent,
-        PropertySeed<TypeT,ClassDeclT,FieldT,MethodT> propertySeed) {
+        ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> parent,
+        PropertySeed<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> propertySeed) {
         super(parent, propertySeed);
 
         isValueList = seed.hasAnnotation(XmlList.class);

@@ -10,8 +10,6 @@
 
 package org.glassfish.jaxb.runtime.v2.runtime;
 
-import org.glassfish.jaxb.core.v2.model.nav.Navigator;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,6 +18,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.glassfish.jaxb.core.v2.model.nav.Navigator;
 
 /**
  * Utils class.
@@ -36,7 +36,7 @@ final class Utils {
     /**
      * static ReflectionNavigator field to avoid usage of reflection every time we use it.
      */
-    static final Navigator<Type, Class, Field, Method> REFLECTION_NAVIGATOR;
+    static final Navigator<Type, Class, Field, Method, ?> REFLECTION_NAVIGATOR;
 
     static { // we statically initializing REFLECTION_NAVIGATOR property
         try {
@@ -59,7 +59,7 @@ final class Utils {
             );
 
             //noinspection unchecked
-            REFLECTION_NAVIGATOR = (Navigator<Type, Class, Field, Method>) getInstance.invoke(null);
+            REFLECTION_NAVIGATOR = (Navigator<Type, Class, Field, Method,?>) getInstance.invoke(null);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Can't find ReflectionNavigator class");
         } catch (InvocationTargetException e) {

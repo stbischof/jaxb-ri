@@ -29,12 +29,12 @@ import java.util.List;
 /**
  * @author Kohsuke Kawaguchi
  */
-final class RuntimeElementInfoImpl extends ElementInfoImpl<Type,Class,Field,Method>
+final class RuntimeElementInfoImpl extends ElementInfoImpl<Type,Class,Field,Method,Object>
     implements RuntimeElementInfo {
 
     @SuppressWarnings({"unchecked"})
     public RuntimeElementInfoImpl(RuntimeModelBuilder modelBuilder, RegistryInfo registry, Method method) throws IllegalAnnotationException {
-        super(modelBuilder, (RegistryInfoImpl<Type, Class, Field, Method>) registry, method);
+        super(modelBuilder, (RegistryInfoImpl<Type, Class, Field, Method,Object>) registry, method);
 
         Adapter<Type,Class> a = getProperty().getAdapter();
 

@@ -47,13 +47,13 @@ public class Adapter<TypeT,ClassDeclT> {
 
     public Adapter(
         XmlJavaTypeAdapter spec,
-        AnnotationReader<TypeT,ClassDeclT,?,?> reader,
-        Navigator<TypeT,ClassDeclT,?,?> nav) {
+        AnnotationReader<TypeT,ClassDeclT,?,?,?> reader,
+        Navigator<TypeT,ClassDeclT,?,?,?> nav) {
 
         this( nav.asDecl(reader.getClassValue(spec,"value")), nav );
     }
 
-    public Adapter(ClassDeclT adapterType,Navigator<TypeT,ClassDeclT,?,?> nav) {
+    public Adapter(ClassDeclT adapterType,Navigator<TypeT,ClassDeclT,?,?,?> nav) {
         this.adapterType = adapterType;
         TypeT baseClass = nav.getBaseClass(nav.use(adapterType), nav.asDecl(XmlAdapter.class));
 

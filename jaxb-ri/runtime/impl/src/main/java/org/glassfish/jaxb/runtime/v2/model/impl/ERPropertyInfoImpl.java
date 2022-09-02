@@ -20,10 +20,10 @@ import javax.xml.namespace.QName;
  *
  * @author Kohsuke Kawaguchi
  */
-abstract class ERPropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
-    extends PropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT> {
+abstract class ERPropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT>
+    extends PropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> {
 
-    public ERPropertyInfoImpl(ClassInfoImpl<TypeT, ClassDeclT, FieldT, MethodT> classInfo, PropertySeed<TypeT, ClassDeclT, FieldT, MethodT> propertySeed) {
+    public ERPropertyInfoImpl(ClassInfoImpl<TypeT, ClassDeclT, FieldT, MethodT, RecordComponentT> classInfo, PropertySeed<TypeT, ClassDeclT, FieldT, MethodT,RecordComponentT> propertySeed) {
         super(classInfo, propertySeed);
 
         XmlElementWrapper e = seed.readAnnotation(XmlElementWrapper.class);

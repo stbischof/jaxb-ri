@@ -53,12 +53,12 @@ public final class Ref<T,C> {
         this.valueList = valueList;
     }
 
-    public Ref(ModelBuilderI<T,C,?,?> builder, T type, XmlJavaTypeAdapter xjta, XmlList xl ) {
+    public Ref(ModelBuilderI<T,C,?,?,?> builder, T type, XmlJavaTypeAdapter xjta, XmlList xl ) {
         this(builder.getReader(),builder.getNavigator(),type,xjta,xl);
     }
 
-    public Ref(AnnotationReader<T,C,?,?> reader,
-               Navigator<T,C,?,?> nav,
+    public Ref(AnnotationReader<T,C,?,?,?> reader,
+               Navigator<T,C,?,?,?> nav,
                T type, XmlJavaTypeAdapter xjta, XmlList xl ) {
         Adapter<T,C> adapter=null;
         if(xjta!=null) {

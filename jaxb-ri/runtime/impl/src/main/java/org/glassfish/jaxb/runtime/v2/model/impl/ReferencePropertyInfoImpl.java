@@ -27,16 +27,16 @@ import java.util.Set;
  *
  * @author Kohsuke Kawaguchi
  */
-class ReferencePropertyInfoImpl<T,C,F,M>
-    extends ERPropertyInfoImpl<T,C,F,M>
-    implements ReferencePropertyInfo<T,C>, DummyPropertyInfo<T, C, F, M>
+class ReferencePropertyInfoImpl<T,C,F,M,R>
+    extends ERPropertyInfoImpl<T,C,F,M,R>
+    implements ReferencePropertyInfo<T,C>, DummyPropertyInfo<T, C, F, M, R>
 {
     /**
      * Lazily computed.
      * @see #getElements()
      */
     private Set<Element<T,C>> types;
-    private Set<ReferencePropertyInfoImpl<T,C,F,M>> subTypes = new LinkedHashSet<>();
+    private Set<ReferencePropertyInfoImpl<T,C,F,M,R>> subTypes = new LinkedHashSet<>();
 
     private final boolean isMixed;
 
@@ -49,8 +49,8 @@ class ReferencePropertyInfoImpl<T,C,F,M>
     private Boolean isRequired;
 
     public ReferencePropertyInfoImpl(
-        ClassInfoImpl<T,C,F,M> classInfo,
-        PropertySeed<T,C,F,M> seed) {
+        ClassInfoImpl<T,C,F,M,R> classInfo,
+        PropertySeed<T,C,F,M,R> seed) {
 
         super(classInfo, seed);
 
@@ -116,8 +116,8 @@ class ReferencePropertyInfoImpl<T,C,F,M>
         isRequired = !isCollection();  // this is by default, to remain compatible with 2.1
 
         if(ann!=null) {
-            Navigator<T,C,F,M> nav = nav();
-            AnnotationReader<T,C,F,M> reader = reader();
+            Navigator<T,C,F,M,R> nav = nav();
+            AnnotationReader<T,C,F,M,R> reader = reader();
 
             final T defaultType = nav.ref(XmlElementRef.DEFAULT.class);
             final C je = nav.asDecl(JAXBElement.class);
@@ -161,8 +161,8 @@ class ReferencePropertyInfoImpl<T,C,F,M>
             }
         }
 
-        for (ReferencePropertyInfoImpl<T, C, F, M> info : subTypes) {
-            PropertySeed<T, C, F, M> sd = info.seed;
+        for (ReferencePropertyInfoImpl<T, C, F, M, R> info : subTypes) {
+            PropertySeed<T, C, F, M, R> sd = info.seed;
             refs = sd.readAnnotation(XmlElementRefs.class);
             ref = sd.readAnnotation(XmlElementRef.class);
 
@@ -185,8 +185,8 @@ class ReferencePropertyInfoImpl<T,C,F,M>
             }
 
             if (ann != null) {
-                Navigator<T,C,F,M> nav = nav();
-                AnnotationReader<T,C,F,M> reader = reader();
+                Navigator<T,C,F,M,R> nav = nav();
+                AnnotationReader<T,C,F,M,R> reader = reader();
 
                 final T defaultType = nav.ref(XmlElementRef.DEFAULT.class);
                 final C je = nav.asDecl(JAXBElement.class);
@@ -271,7 +271,7 @@ class ReferencePropertyInfoImpl<T,C,F,M>
         return addGenericElement(parent.owner.getElementInfo(parent.getClazz(),new QName(nsUri,r.name())));
     }
 
-    private boolean addGenericElement(XmlElementRef r, ReferencePropertyInfoImpl<T,C,F,M> info) {
+    private boolean addGenericElement(XmlElementRef r, ReferencePropertyInfoImpl<T,C,F,M,R> info) {
         String nsUri = info.getEffectiveNamespaceFor(r);
         ElementInfo ei = parent.owner.getElementInfo(info.parent.getClazz(), new QName(nsUri, r.name()));
         types.add(ei);
@@ -302,7 +302,7 @@ class ReferencePropertyInfoImpl<T,C,F,M>
     }
 
     private boolean addAllSubtypes(T type) {
-        Navigator<T,C,F,M> nav = nav();
+        Navigator<T,C,F,M,R> nav = nav();
 
         // this allows the explicitly referenced type to be sucked in to the model
         NonElement<T,C> t = parent.builder.getClassInfo(nav.asDecl(type),this);

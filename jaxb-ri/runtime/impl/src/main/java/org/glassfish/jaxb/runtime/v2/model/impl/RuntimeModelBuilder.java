@@ -49,7 +49,7 @@ import java.util.Map;
  *
  * @author Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public class RuntimeModelBuilder extends ModelBuilder<Type,Class,Field,Method> {
+public class RuntimeModelBuilder extends ModelBuilder<Type,Class,Field,Method,Object> {
     /**
      * The {@link JAXBContextImpl} for which the model is built.
      * Null when created for reflection.
@@ -93,7 +93,7 @@ public class RuntimeModelBuilder extends ModelBuilder<Type,Class,Field,Method> {
     }
 
     @Override
-    protected TypeInfoSet<Type, Class, Field, Method> createTypeInfoSet() {
+    protected TypeInfoSet<Type, Class, Field, Method,Object> createTypeInfoSet() {
         return new RuntimeTypeInfoSetImpl(reader);
     }
 

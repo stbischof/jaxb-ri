@@ -11,11 +11,13 @@
 package org.glassfish.jaxb.runtime.v2.runtime.unmarshaller;
 
 import org.glassfish.jaxb.core.Utils;
+import org.glassfish.jaxb.core.v2.util.RecordComponentProxy;
 import org.glassfish.jaxb.runtime.api.AccessorException;
 import org.glassfish.jaxb.runtime.api.JAXBRIContext;
 import org.glassfish.jaxb.runtime.v2.runtime.ClassBeanInfoImpl;
 import org.glassfish.jaxb.runtime.v2.runtime.JAXBContextImpl;
 import org.glassfish.jaxb.runtime.v2.runtime.JaxBeanInfo;
+import org.glassfish.jaxb.runtime.v2.runtime.RecordBuilder;
 import org.glassfish.jaxb.runtime.v2.runtime.property.AttributeProperty;
 import org.glassfish.jaxb.runtime.v2.runtime.property.Property;
 import org.glassfish.jaxb.runtime.v2.runtime.property.StructureLoaderBuilder;
@@ -155,6 +157,11 @@ public final class StructureLoader extends Loader {
         if(child == null)
             child = context.createInstance(beanInfo);
 
+        if(child==null) {
+            
+        	child= new RecordBuilder(beanInfo.jaxbType);
+        }
+        
         context.recordInnerPeer(child);
 
         state.setTarget(child);
@@ -259,11 +266,17 @@ public final class StructureLoader extends Loader {
             textHandler.loader.text(state,text);
     }
 
-    @Override
-    public void leaveElement(UnmarshallingContext.State state, TagName ea) throws SAXException {
-        state.getContext().endScope(frameSize);
-        fireAfterUnmarshal(beanInfo, state.getTarget(), state.getPrev());
-    }
+	@Override
+	public void leaveElement(UnmarshallingContext.State state, TagName ea) throws SAXException {
+		Object o = state.getTarget();
+		if (o instanceof RecordBuilder) {
+			RecordBuilder rb = (RecordBuilder) o;
+			state.setTarget(rb.build());
+		}
+
+		state.getContext().endScope(frameSize);
+		fireAfterUnmarshal(beanInfo, state.getTarget(), state.getPrev());
+	}
 
     private static final QNameMap<TransducedAccessor> EMPTY = new QNameMap<>();
 

@@ -18,6 +18,8 @@ import org.glassfish.jaxb.runtime.v2.model.runtime.RuntimePropertyInfo;
 import org.glassfish.jaxb.core.v2.runtime.IllegalAnnotationException;
 import org.glassfish.jaxb.runtime.v2.runtime.Transducer;
 import org.glassfish.jaxb.runtime.v2.runtime.reflect.Accessor;
+import org.glassfish.jaxb.runtime.v2.runtime.reflect.Accessor.GetterOnlyReflection;
+
 import jakarta.xml.bind.annotation.XmlList;
 
 import java.util.Collections;
@@ -30,8 +32,8 @@ import java.util.List;
  *
  * @author Kohsuke Kawaguchi
  */
-abstract class SingleTypePropertyInfoImpl<T,C,F,M>
-    extends PropertyInfoImpl<T,C,F,M> {
+abstract class SingleTypePropertyInfoImpl<T,C,F,M,R>
+    extends PropertyInfoImpl<T,C,F,M,R> {
 
     /**
      * Computed lazily.
@@ -40,7 +42,7 @@ abstract class SingleTypePropertyInfoImpl<T,C,F,M>
      */
     private NonElement<T,C> type;
 
-    public SingleTypePropertyInfoImpl(ClassInfoImpl<T,C,F,M> classInfo, PropertySeed<T,C,F,M> seed) {
+    public SingleTypePropertyInfoImpl(ClassInfoImpl<T,C,F,M,R> classInfo, PropertySeed<T,C,F,M,R> seed) {
         super(classInfo, seed);
         if(this instanceof RuntimePropertyInfo) {
             Accessor rawAcc = ((RuntimeClassInfoImpl.RuntimePropertySeed)seed).getAccessor();
@@ -50,7 +52,7 @@ abstract class SingleTypePropertyInfoImpl<T,C,F,M>
                 rawAcc = rawAcc.adapt(((RuntimePropertyInfo)this).getAdapter());
             this.acc = rawAcc;
         } else
-            this.acc = null;
+            this.acc = null;//new GetterOnlyReflection();
     }
 
     @Override

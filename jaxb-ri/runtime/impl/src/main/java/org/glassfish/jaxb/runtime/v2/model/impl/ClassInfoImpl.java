@@ -10,7 +10,44 @@
 
 package org.glassfish.jaxb.runtime.v2.model.impl;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.xml.namespace.QName;
+
+import org.glassfish.jaxb.core.annotation.OverrideAnnotationOf;
+import org.glassfish.jaxb.core.v2.model.annotation.Locatable;
+import org.glassfish.jaxb.core.v2.model.core.AttributePropertyInfo;
+import org.glassfish.jaxb.core.v2.model.core.ClassInfo;
+import org.glassfish.jaxb.core.v2.model.core.Element;
+import org.glassfish.jaxb.core.v2.model.core.ElementPropertyInfo;
+import org.glassfish.jaxb.core.v2.model.core.ID;
+import org.glassfish.jaxb.core.v2.model.core.MapPropertyInfo;
+import org.glassfish.jaxb.core.v2.model.core.NonElement;
+import org.glassfish.jaxb.core.v2.model.core.PropertyInfo;
+import org.glassfish.jaxb.core.v2.model.core.PropertyKind;
+import org.glassfish.jaxb.core.v2.model.core.ReferencePropertyInfo;
+import org.glassfish.jaxb.core.v2.model.core.ValuePropertyInfo;
+import org.glassfish.jaxb.core.v2.runtime.IllegalAnnotationException;
+import org.glassfish.jaxb.core.v2.runtime.Location;
+import org.glassfish.jaxb.core.v2.util.EditDistance;
+import org.glassfish.jaxb.core.v2.util.RecordComponentProxy;
+import org.glassfish.jaxb.runtime.v2.model.annotation.MethodLocatable;
+
 import com.sun.istack.FinalArrayList;
+
 import jakarta.xml.bind.annotation.XmlAccessOrder;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorOrder;
@@ -38,39 +75,6 @@ import jakarta.xml.bind.annotation.XmlValue;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
-import org.glassfish.jaxb.core.annotation.OverrideAnnotationOf;
-import org.glassfish.jaxb.core.v2.model.annotation.Locatable;
-import org.glassfish.jaxb.core.v2.model.core.AttributePropertyInfo;
-import org.glassfish.jaxb.core.v2.model.core.ClassInfo;
-import org.glassfish.jaxb.core.v2.model.core.Element;
-import org.glassfish.jaxb.core.v2.model.core.ElementPropertyInfo;
-import org.glassfish.jaxb.core.v2.model.core.ID;
-import org.glassfish.jaxb.core.v2.model.core.MapPropertyInfo;
-import org.glassfish.jaxb.core.v2.model.core.NonElement;
-import org.glassfish.jaxb.core.v2.model.core.PropertyInfo;
-import org.glassfish.jaxb.core.v2.model.core.PropertyKind;
-import org.glassfish.jaxb.core.v2.model.core.ReferencePropertyInfo;
-import org.glassfish.jaxb.core.v2.model.core.ValuePropertyInfo;
-import org.glassfish.jaxb.core.v2.runtime.IllegalAnnotationException;
-import org.glassfish.jaxb.core.v2.runtime.Location;
-import org.glassfish.jaxb.core.v2.util.EditDistance;
-import org.glassfish.jaxb.runtime.v2.model.annotation.MethodLocatable;
-
-import javax.xml.namespace.QName;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 
 /**
@@ -79,7 +83,7 @@ import java.util.TreeSet;
  *
  * @author Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
+public class ClassInfoImpl<T,C,F,M,R> extends TypeInfoImpl<T,C,F,M,R>
     implements ClassInfo<T,C>, Element<T,C> {
 
     protected final C clazz;
@@ -99,7 +103,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
      *
      * @see #getProperties()
      */
-    private FinalArrayList<PropertyInfoImpl<T,C,F,M>> properties;
+    private FinalArrayList<PropertyInfoImpl<T,C,F,M,R>> properties;
 
     /**
      * The property order.
@@ -115,7 +119,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
      *
      * To avoid the cyclic references of the form C1 --base--{@literal >} C2 --property--{@literal >} C1.
      */
-    private ClassInfoImpl<T,C,F,M> baseClass;
+    private ClassInfoImpl<T,C,F,M,R> baseClass;
 
     private boolean baseClassComputed = false;
 
@@ -127,7 +131,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
      *
      * This parameter is initialized at the construction time and never change.
      */
-    protected /*final*/ PropertySeed<T,C,F,M> attributeWildcard;
+    protected /*final*/ PropertySeed<T,C,F,M,R> attributeWildcard;
 
 
     /**
@@ -135,7 +139,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
      */
     private M factoryMethod = null;
     
-    ClassInfoImpl(ModelBuilder<T,C,F,M> builder, Locatable upstream, C clazz) {
+    ClassInfoImpl(ModelBuilder<T,C,F,M,R> builder, Locatable upstream, C clazz) {
         super(builder,upstream);
         this.clazz = clazz;
         assert clazz!=null;
@@ -178,24 +182,28 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
             builder.reportError(new IllegalAnnotationException(
                 Messages.CANT_HANDLE_INTERFACE.format(nav().getClassName(clazz)), this ));
         }
-
-        // the class must have the default constructor
-        if (!hasFactoryConstructor(t)){
-            if(!nav().hasDefaultConstructor(clazz)){
-                if(nav().isInnerClass(clazz)) {
-                    builder.reportError(new IllegalAnnotationException(
-                        Messages.CANT_HANDLE_INNER_CLASS.format(nav().getClassName(clazz)), this ));
-                } else if (elementName != null) {
-                    builder.reportError(new IllegalAnnotationException(
-                        Messages.NO_DEFAULT_CONSTRUCTOR.format(nav().getClassName(clazz)), this ));
-                }
-            }
+        
+        if(nav().isRecord(clazz)) {
+        	
+        }else {
+	        // the class must have the default constructor
+	        if (!hasFactoryConstructor(t)){
+	            if(!nav().hasDefaultConstructor(clazz)){
+	                if(nav().isInnerClass(clazz)) {
+	                    builder.reportError(new IllegalAnnotationException(
+	                        Messages.CANT_HANDLE_INNER_CLASS.format(nav().getClassName(clazz)), this ));
+	                } else if (elementName != null) {
+	                    builder.reportError(new IllegalAnnotationException(
+	                        Messages.NO_DEFAULT_CONSTRUCTOR.format(nav().getClassName(clazz)), this ));
+	                }
+	            }
+	        }
         }
     }        
 
     @Override
     @SuppressWarnings({"unchecked"})
-    public ClassInfoImpl<T,C,F,M> getBaseClass() {
+    public ClassInfoImpl<T,C,F,M,R> getBaseClass() {
         if (!baseClassComputed) {
             // compute the base class
             C s = nav().getSuperClass(clazz);
@@ -204,7 +212,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
             } else {
                 NonElement<T,C> b = builder.getClassInfo(s, true, this);
                 if(b instanceof ClassInfoImpl) {
-                    baseClass = (ClassInfoImpl<T,C,F,M>) b;
+                    baseClass = (ClassInfoImpl<T,C,F,M,R>) b;
                     baseClass.hasSubClasses = true;
                 } else {
                     baseClass = null;
@@ -222,7 +230,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
      */
     @Override
     public final Element<T,C> getSubstitutionHead() {
-        ClassInfoImpl<T,C,F,M> c = getBaseClass();
+        ClassInfoImpl<T,C,F,M,R> c = getBaseClass();
         while(c!=null && !c.isElement())
             c = c.getBaseClass();
         return c;
@@ -242,7 +250,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
      */
     @Override
     @Deprecated
-    public ClassInfoImpl<T,C,F,M> getScope() {
+    public ClassInfoImpl<T,C,F,M,R> getScope() {
         return null;
     }
 
@@ -261,7 +269,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
             if(p.id()== ID.ID)
                 return true;
         }
-        ClassInfoImpl<T,C,F,M> base = getBaseClass();
+        ClassInfoImpl<T,C,F,M,R> base = getBaseClass();
         if(base!=null)
             return base.canBeReferencedByIDREF();
         else
@@ -294,9 +302,14 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
 
         properties = new FinalArrayList<>();
 
-        findFieldProperties(clazz,at);
+		if (nav().isRecord(clazz)) {
+			findRecordProperties(clazz, at);
 
-        findGetterSetterProperties(at);
+		} else {
+			findFieldProperties(clazz, at);
+
+			findGetterSetterProperties(at);
+		}
 
         if(propOrder==DEFAULT_ORDER || propOrder==null) {
             XmlAccessOrder ao = getAccessorOrder();
@@ -354,7 +367,23 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
 
         return properties;
     }
+    private void findRecordProperties(C c, XmlAccessType at) {
 
+    	// always find properties from the super class first
+        C sc = nav().getSuperClass(c);
+        if (shouldRecurseSuperClass(sc)) {
+        	findRecordProperties(sc,at);
+        }
+        for( R recordComponent : nav().getRecordComponents(c) ) {
+            Annotation[] annotations = reader().getAllRecordComponentAnnotations(recordComponent,this);
+
+        	
+            addProperty(createRecordComponentSeed(recordComponent), annotations, false);
+
+        }
+
+
+    }
     private void findFieldProperties(C c, XmlAccessType at) {
 
         // always find properties from the super class first
@@ -401,7 +430,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
 
     @Override
     public final boolean hasValueProperty() {
-        ClassInfoImpl<T, C, F, M> bc = getBaseClass();
+        ClassInfoImpl<T, C, F, M, R> bc = getBaseClass();
         if(bc!=null && bc.hasValueProperty())
             return true;
 
@@ -720,7 +749,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
      *      because the caller should know it already.
      */
     @SuppressWarnings({"unchecked"})
-    private void addProperty( PropertySeed<T,C,F,M> seed, Annotation[] annotations, boolean dummy ) {
+    private void addProperty( PropertySeed<T,C,F,M,R> seed, Annotation[] annotations, boolean dummy ) {
         // since typically there's a very few annotations on a method,
         // this runs faster than checking for each annotation via readAnnotation(A)
 
@@ -876,19 +905,19 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
 
                 return;
             case ATTRIBUTE:
-                properties.add((PropertyInfoImpl<T, C, F, M>) createAttributeProperty(seed));
+                properties.add((PropertyInfoImpl<T, C, F, M, R>) createAttributeProperty(seed));
                 return;
             case VALUE:
-                properties.add((PropertyInfoImpl<T, C, F, M>) createValueProperty(seed));
+                properties.add((PropertyInfoImpl<T, C, F, M, R>) createValueProperty(seed));
                 return;
             case ELEMENT:
-                properties.add((PropertyInfoImpl<T, C, F, M>) createElementProperty(seed));
+                properties.add((PropertyInfoImpl<T, C, F, M, R>) createElementProperty(seed));
                 return;
             case ELEMENT_REF:
-                properties.add((PropertyInfoImpl<T, C, F, M>) createReferenceProperty(seed));
+                properties.add((PropertyInfoImpl<T, C, F, M, R>) createReferenceProperty(seed));
                 return;
             case MAP:
-                properties.add((PropertyInfoImpl<T, C, F, M>) createMapProperty(seed));
+                properties.add((PropertyInfoImpl<T, C, F, M, R>) createMapProperty(seed));
                 return;
             default:
                 assert false;
@@ -914,23 +943,23 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
         }
     }
 
-    protected ReferencePropertyInfo<T,C> createReferenceProperty(PropertySeed<T,C,F,M> seed) {
+    protected ReferencePropertyInfo<T,C> createReferenceProperty(PropertySeed<T,C,F,M,R> seed) {
         return new ReferencePropertyInfoImpl<>(this,seed);
     }
 
-    protected AttributePropertyInfo<T,C> createAttributeProperty(PropertySeed<T,C,F,M> seed) {
+    protected AttributePropertyInfo<T,C> createAttributeProperty(PropertySeed<T,C,F,M,R> seed) {
         return new AttributePropertyInfoImpl<>(this,seed);
     }
 
-    protected ValuePropertyInfo<T,C> createValueProperty(PropertySeed<T,C,F,M> seed) {
+    protected ValuePropertyInfo<T,C> createValueProperty(PropertySeed<T,C,F,M,R> seed) {
         return new ValuePropertyInfoImpl<>(this,seed);
     }
 
-    protected ElementPropertyInfo<T,C> createElementProperty(PropertySeed<T,C,F,M> seed) {
+    protected ElementPropertyInfo<T,C> createElementProperty(PropertySeed<T,C,F,M,R> seed) {
         return new ElementPropertyInfoImpl<>(this,seed);
     }
 
-    protected MapPropertyInfo<T,C> createMapProperty(PropertySeed<T,C,F,M> seed) {
+    protected MapPropertyInfo<T,C> createMapProperty(PropertySeed<T,C,F,M,R> seed) {
         return new MapPropertyInfoImpl<>(this,seed);
     }
 
@@ -1191,14 +1220,24 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
      * <p>
      * Derived class can override this method to create a sub-class.
      */
-    protected PropertySeed<T,C,F,M> createFieldSeed(F f) {
+    protected PropertySeed<T,C,F,M,R> createFieldSeed(F f) {
         return new FieldPropertySeed<>(this, f);
+    }
+    
+    /**
+     * Creates a new {@link RecordComponentPropertySeed} object.
+     *
+     * <p>
+     * Derived class can override this method to create a sub-class.
+     */
+    protected PropertySeed<T,C,F,M,R> createRecordComponentSeed(R rc) {
+        return new RecordComponentPropertySeed(this, rc);
     }
 
     /**
      * Creates a new {@link GetterSetterPropertySeed} object.
      */
-    protected PropertySeed<T,C,F,M> createAccessorSeed(M getter, M setter) {
+    protected PropertySeed<T,C,F,M,R> createAccessorSeed(M getter, M setter) {
         return new GetterSetterPropertySeed<>(this, getter,setter);
     }
 
@@ -1245,8 +1284,8 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
     /**
      * Gets the {@link PropertySeed} object for the inherited attribute wildcard.
      */
-    private PropertySeed<T,C,F,M> getInheritedAttributeWildcard() {
-        for( ClassInfoImpl<T,C,F,M> c=getBaseClass(); c!=null; c=c.getBaseClass() )
+    private PropertySeed<T,C,F,M,R> getInheritedAttributeWildcard() {
+        for( ClassInfoImpl<T,C,F,M,R> c=getBaseClass(); c!=null; c=c.getBaseClass() )
             if(c.attributeWildcard!=null)
                 return c.attributeWildcard;
         return null;
@@ -1278,7 +1317,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
 
         // property name collision cehck
         Map<String,PropertyInfoImpl> names = new HashMap<>();
-        for( PropertyInfoImpl<T,C,F,M> p : properties ) {
+        for( PropertyInfoImpl<T,C,F,M,R> p : properties ) {
             p.link();
             PropertyInfoImpl old = names.put(p.getName(),p);
             if(old!=null) {
@@ -1337,7 +1376,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
         return (Method) factoryMethod;
     }
 
-    private boolean hasApplicableAdapter(PropertySeed<T, C, F, M> seed, T type) {
+    private boolean hasApplicableAdapter(PropertySeed<T, C, F, M, R> seed, T type) {
         XmlJavaTypeAdapter jta = seed.readAnnotation(XmlJavaTypeAdapter.class);
         if (jta != null && isApplicable(jta, type)) {
             return true;

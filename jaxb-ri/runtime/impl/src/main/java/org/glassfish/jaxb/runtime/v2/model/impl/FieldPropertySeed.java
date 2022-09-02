@@ -19,13 +19,13 @@ import java.lang.annotation.Annotation;
 /**
  * {@link PropertyInfo} implementation backed by a field.
  */
-class FieldPropertySeed<TypeT,ClassDeclT,FieldT,MethodT> implements
-        PropertySeed<TypeT,ClassDeclT,FieldT,MethodT> {
+class FieldPropertySeed<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> implements
+        PropertySeed<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> {
 
     protected final FieldT field;
-    private ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT> parent;
+    private ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> parent;
 
-    FieldPropertySeed(ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT> classInfo, FieldT field) {
+    FieldPropertySeed(ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> classInfo, FieldT field) {
         this.parent = classInfo;
         this.field = field;
     }

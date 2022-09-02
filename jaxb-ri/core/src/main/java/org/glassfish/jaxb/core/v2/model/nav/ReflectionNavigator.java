@@ -26,12 +26,13 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.glassfish.jaxb.core.v2.runtime.Location;
+import org.glassfish.jaxb.core.v2.util.RecordComponentProxy;
 
 /**
  * {@link Navigator} implementation for {@code java.lang.reflect}.
  *
  */
-/*package*/final class ReflectionNavigator implements Navigator<Type, Class<?>, Field, Method> {
+/*package*/final class ReflectionNavigator implements Navigator<Type, Class<?>, Field, Method, Object> {
 
 //  ----------  Singleton -----------------
     private static final ReflectionNavigator INSTANCE = new ReflectionNavigator();
@@ -704,4 +705,45 @@ import org.glassfish.jaxb.core.v2.runtime.Location;
 
         return t;
     }
+
+	@Override
+	public boolean isRecord(Class<?> clazz) {
+		return RecordComponentProxy.isRecord(clazz);
+	}
+
+	@Override
+	public RecordComponentProxy[] getRecordComponents(Class<?> c) {
+		return RecordComponentProxy.recordComponents(c);
+	}
+
+	@Override
+	public String getRecordComponentName(Object rc) {
+		RecordComponentProxy r=(RecordComponentProxy) rc;
+		return r.getName();
+	}
+
+	@Override
+	public Type getRecordComponentType(Object rc) {
+		RecordComponentProxy r=(RecordComponentProxy) rc;
+        if (r.getType().isArray()) {
+            Class<?> c = r.getType().getComponentType();
+            if (c.isPrimitive()) {
+                return Array.newInstance(c, 0).getClass();
+            }
+        }
+        return fix(r.getGenericType());
+	}
+
+	@Override
+	public Location getRecordComponentLocation(Object rc) {
+		RecordComponentProxy r=(RecordComponentProxy) rc;
+
+        return new Location() {
+
+            @Override
+            public String toString() {
+                return r.toString();
+            }
+        };
+	}
 }

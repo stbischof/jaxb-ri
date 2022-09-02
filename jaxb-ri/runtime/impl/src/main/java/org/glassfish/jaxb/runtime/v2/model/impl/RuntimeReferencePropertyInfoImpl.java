@@ -22,12 +22,12 @@ import java.util.Set;
 /**
  * @author Kohsuke Kawaguchi
  */
-class RuntimeReferencePropertyInfoImpl extends ReferencePropertyInfoImpl<Type,Class,Field,Method>
+class RuntimeReferencePropertyInfoImpl extends ReferencePropertyInfoImpl<Type,Class,Field,Method,Object>
     implements RuntimeReferencePropertyInfo {
 
     private final Accessor acc;
 
-    public RuntimeReferencePropertyInfoImpl(RuntimeClassInfoImpl classInfo, PropertySeed<Type,Class,Field,Method> seed) {
+    public RuntimeReferencePropertyInfoImpl(RuntimeClassInfoImpl classInfo, PropertySeed<Type,Class,Field,Method,Object> seed) {
         super(classInfo,seed);
         Accessor rawAcc = ((RuntimeClassInfoImpl.RuntimePropertySeed)seed).getAccessor();
         if(getAdapter()!=null && !isCollection())

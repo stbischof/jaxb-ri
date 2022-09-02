@@ -22,7 +22,7 @@ import java.lang.reflect.Type;
 /**
  * @author Kohsuke Kawaguchi
  */
-final class RuntimeArrayInfoImpl extends ArrayInfoImpl<Type,Class,Field,Method> implements RuntimeArrayInfo {
+final class RuntimeArrayInfoImpl extends ArrayInfoImpl<Type,Class,Field,Method,Object> implements RuntimeArrayInfo {
     RuntimeArrayInfoImpl(RuntimeModelBuilder builder, Locatable upstream, Class arrayType) {
         super(builder, upstream, arrayType);
     }

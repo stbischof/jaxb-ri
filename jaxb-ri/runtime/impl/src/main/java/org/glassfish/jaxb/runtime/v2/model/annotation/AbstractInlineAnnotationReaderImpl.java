@@ -25,8 +25,8 @@ import java.lang.annotation.Annotation;
  *
  * @author Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public abstract class AbstractInlineAnnotationReaderImpl<T,C,F,M>
-    implements AnnotationReader<T,C,F,M> {
+public abstract class AbstractInlineAnnotationReaderImpl<T,C,F,M,R>
+    implements AnnotationReader<T,C,F,M,R> {
 
     private ErrorHandler errorHandler;
 

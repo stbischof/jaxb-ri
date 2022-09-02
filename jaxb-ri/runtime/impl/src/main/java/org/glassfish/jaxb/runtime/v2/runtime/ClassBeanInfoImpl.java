@@ -14,6 +14,7 @@ import com.sun.istack.FinalArrayList;
 import org.glassfish.jaxb.runtime.api.AccessorException;
 import org.glassfish.jaxb.core.v2.ClassFactory;
 import org.glassfish.jaxb.core.v2.model.core.ID;
+import org.glassfish.jaxb.core.v2.util.RecordComponentProxy;
 import org.glassfish.jaxb.runtime.v2.model.runtime.RuntimeClassInfo;
 import org.glassfish.jaxb.runtime.v2.model.runtime.RuntimePropertyInfo;
 import org.glassfish.jaxb.runtime.v2.runtime.property.AttributeProperty;
@@ -40,6 +41,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -102,6 +104,7 @@ public final class ClassBeanInfoImpl<BeanT> extends JaxBeanInfo<BeanT> implement
     private /*final*/ Property<BeanT>[] uriProperties;
 
     private final Method factoryMethod;
+
     
     /*package*/ ClassBeanInfoImpl(JAXBContextImpl owner, RuntimeClassInfo ci) {
         super(owner,ci,ci.getClazz(),ci.getTypeName(),ci.isElement(),false,true);
@@ -252,7 +255,12 @@ public final class ClassBeanInfoImpl<BeanT> extends JaxBeanInfo<BeanT> implement
         
         BeanT bean = null;        
         if (factoryMethod == null){
-           bean = ClassFactory.create0(jaxbType);
+        	
+        	if(RecordComponentProxy.isRecord(jaxbType)) {
+        		bean=null;
+        	}else {
+        	  bean = ClassFactory.create0(jaxbType);
+            }
         }else {
             Object o = ClassFactory.create(factoryMethod);
             if( jaxbType.isInstance(o) ){

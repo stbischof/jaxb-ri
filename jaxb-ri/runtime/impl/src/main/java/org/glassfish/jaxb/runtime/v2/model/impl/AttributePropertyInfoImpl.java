@@ -21,15 +21,15 @@ import javax.xml.namespace.QName;
 /**
  * @author Kohsuke Kawaguchi
  */
-class AttributePropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
-    extends SingleTypePropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
+class AttributePropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT>
+    extends SingleTypePropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT>
     implements AttributePropertyInfo<TypeT,ClassDeclT> {
 
     private final QName xmlName;
 
     private final boolean isRequired;
 
-    AttributePropertyInfoImpl(ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT> parent, PropertySeed<TypeT,ClassDeclT,FieldT,MethodT> seed ) {
+    AttributePropertyInfoImpl(ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> parent, PropertySeed<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> seed ) {
         super(parent,seed);
         XmlAttribute att = seed.readAnnotation(XmlAttribute.class);
         assert att!=null;

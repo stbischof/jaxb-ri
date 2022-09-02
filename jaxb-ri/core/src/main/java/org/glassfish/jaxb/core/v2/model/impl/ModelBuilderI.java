@@ -17,9 +17,9 @@ import org.glassfish.jaxb.core.v2.model.nav.Navigator;
  * User: Iaroslav Savytskyi
  * Date: 24/05/12
  */
-public interface ModelBuilderI<T,C,F,M> {
+public interface ModelBuilderI<T,C,F,M,R> {
 
-    Navigator<T,C,F,M> getNavigator();
+    Navigator<T,C,F,M,R> getNavigator();
 
-    AnnotationReader<T,C,F,M> getReader();
+    AnnotationReader<T,C,F,M,R> getReader();
 }

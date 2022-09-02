@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * @author Kohsuke Kawaguchi
  */
-final class RuntimeEnumLeafInfoImpl<T extends Enum<T>,B> extends EnumLeafInfoImpl<Type,Class,Field,Method>
+final class RuntimeEnumLeafInfoImpl<T extends Enum<T>,B> extends EnumLeafInfoImpl<Type,Class,Field,Method,Object>
     implements RuntimeEnumLeafInfo, Transducer<T> {
 
     @Override
@@ -59,7 +59,7 @@ final class RuntimeEnumLeafInfoImpl<T extends Enum<T>,B> extends EnumLeafInfoImp
     }
 
     @Override
-    public RuntimeEnumConstantImpl createEnumConstant(String name, String literal, Field constant, EnumConstantImpl<Type,Class,Field,Method> last) {
+    public RuntimeEnumConstantImpl createEnumConstant(String name, String literal, Field constant, EnumConstantImpl<Type,Class,Field,Method,Object> last) {
         T t;
         try {
             try {

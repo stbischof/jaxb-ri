@@ -366,4 +366,9 @@ public final class NavigatorImpl implements Navigator<NType,NClass,Void,Void> {
     public boolean isSameType(NType t1, NType t2) {
          throw new UnsupportedOperationException();
     }
+
+	@Override
+	public boolean isRecord(NClass clazz) {
+        throw new UnsupportedOperationException();
+	}
 }

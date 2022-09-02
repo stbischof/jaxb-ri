@@ -18,7 +18,7 @@ import org.glassfish.jaxb.runtime.v2.model.runtime.RuntimePropertyInfo;
 /**
  * Exposes the core information that forms a {@link PropertyInfo}.
  */
-public interface PropertySeed<T,C,F,M> extends Locatable, AnnotationSource {
+public interface PropertySeed<T,C,F,M,R> extends Locatable, AnnotationSource {
 
     /**
      * The name of the property is a spec defined concept --- although it doesn't do

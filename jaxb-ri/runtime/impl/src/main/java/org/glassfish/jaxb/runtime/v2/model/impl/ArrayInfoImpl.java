@@ -26,8 +26,8 @@ import javax.xml.namespace.QName;
  *
  * @author Kohsuke Kawaguchi
  */
-class ArrayInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
-    extends TypeInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
+class ArrayInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT>
+    extends TypeInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT>
     implements ArrayInfo<TypeT,ClassDeclT>, Location {
 
     private final NonElement<TypeT,ClassDeclT> itemType;
@@ -39,7 +39,7 @@ class ArrayInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
      */
     private final TypeT arrayType;
 
-    public ArrayInfoImpl(ModelBuilder<TypeT,ClassDeclT,FieldT,MethodT> builder,
+    public ArrayInfoImpl(ModelBuilder<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> builder,
                          Locatable upstream, TypeT arrayType) {
         super(builder, upstream);
         this.arrayType = arrayType;

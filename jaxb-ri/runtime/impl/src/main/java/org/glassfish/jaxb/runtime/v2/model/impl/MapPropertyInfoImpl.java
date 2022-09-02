@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Kohsuke Kawaguchi
  */
-class MapPropertyInfoImpl<T,C,F,M> extends PropertyInfoImpl<T,C,F,M> implements MapPropertyInfo<T,C> {
+class MapPropertyInfoImpl<T,C,F,M,R> extends PropertyInfoImpl<T,C,F,M,R> implements MapPropertyInfo<T,C> {
 
     private final QName xmlName;
     private boolean nil;
@@ -36,7 +36,7 @@ class MapPropertyInfoImpl<T,C,F,M> extends PropertyInfoImpl<T,C,F,M> implements 
     private NonElement<T,C> valueTypeInfo;
 
 
-    public MapPropertyInfoImpl(ClassInfoImpl<T,C,F,M> ci, PropertySeed<T,C,F,M> seed) {
+    public MapPropertyInfoImpl(ClassInfoImpl<T,C,F,M,R> ci, PropertySeed<T,C,F,M,R> seed) {
         super(ci, seed);
 
         XmlElementWrapper xe = seed.readAnnotation(XmlElementWrapper.class);

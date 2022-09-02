@@ -19,5 +19,5 @@ import java.lang.reflect.Type;
 /**
  * @author Kohsuke Kawaguchi
  */
-public interface RuntimeAnnotationReader extends AnnotationReader<Type,Class,Field,Method> {
+public interface RuntimeAnnotationReader extends AnnotationReader<Type,Class,Field,Method,Object> {
 }

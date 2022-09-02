@@ -23,10 +23,10 @@ import java.util.List;
 /**
  * @author Kohsuke Kawaguchi
  */
-class RuntimeMapPropertyInfoImpl extends MapPropertyInfoImpl<Type,Class,Field,Method> implements RuntimeMapPropertyInfo {
+class RuntimeMapPropertyInfoImpl extends MapPropertyInfoImpl<Type,Class,Field,Method,Object> implements RuntimeMapPropertyInfo {
     private final Accessor acc;
 
-    RuntimeMapPropertyInfoImpl(RuntimeClassInfoImpl classInfo, PropertySeed<Type,Class,Field,Method> seed) {
+    RuntimeMapPropertyInfoImpl(RuntimeClassInfoImpl classInfo, PropertySeed<Type,Class,Field,Method,Object> seed) {
         super(classInfo, seed);
         this.acc = ((RuntimeClassInfoImpl.RuntimePropertySeed)seed).getAccessor();
     }

@@ -22,10 +22,10 @@ import java.util.List;
 /**
  * @author Kohsuke Kawaguchi
  */
-class RuntimeAttributePropertyInfoImpl extends AttributePropertyInfoImpl<Type,Class,Field,Method>
+class RuntimeAttributePropertyInfoImpl extends AttributePropertyInfoImpl<Type,Class,Field,Method,Object>
     implements RuntimeAttributePropertyInfo {
 
-    RuntimeAttributePropertyInfoImpl(RuntimeClassInfoImpl classInfo, PropertySeed<Type,Class,Field,Method> seed) {
+    RuntimeAttributePropertyInfoImpl(RuntimeClassInfoImpl classInfo, PropertySeed<Type,Class,Field,Method,Object> seed) {
         super(classInfo, seed);
     }
 

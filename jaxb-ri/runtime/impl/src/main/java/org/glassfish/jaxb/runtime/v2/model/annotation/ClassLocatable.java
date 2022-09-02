@@ -22,9 +22,9 @@ import org.glassfish.jaxb.core.v2.runtime.Location;
 public class ClassLocatable<C> implements Locatable {
     private final Locatable upstream;
     private final C clazz;
-    private final Navigator<?,C,?,?> nav;
+    private final Navigator<?,C,?,?,?> nav;
 
-    public ClassLocatable(Locatable upstream, C clazz, Navigator<?,C,?,?> nav) {
+    public ClassLocatable(Locatable upstream, C clazz, Navigator<?,C,?,?,?> nav) {
         this.upstream = upstream;
         this.clazz = clazz;
         this.nav = nav;

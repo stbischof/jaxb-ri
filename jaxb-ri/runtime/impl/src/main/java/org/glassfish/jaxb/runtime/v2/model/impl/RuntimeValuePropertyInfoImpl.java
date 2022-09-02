@@ -22,10 +22,10 @@ import java.util.List;
 /**
  * @author Kohsuke Kawaguchi
  */
-final class RuntimeValuePropertyInfoImpl extends ValuePropertyInfoImpl<Type,Class,Field,Method>
+final class RuntimeValuePropertyInfoImpl extends ValuePropertyInfoImpl<Type,Class,Field,Method,Object>
     implements RuntimeValuePropertyInfo {
 
-    RuntimeValuePropertyInfoImpl(RuntimeClassInfoImpl classInfo, PropertySeed<Type,Class,Field,Method> seed) {
+    RuntimeValuePropertyInfoImpl(RuntimeClassInfoImpl classInfo, PropertySeed<Type,Class,Field,Method,Object> seed) {
         super(classInfo, seed);
     }
 

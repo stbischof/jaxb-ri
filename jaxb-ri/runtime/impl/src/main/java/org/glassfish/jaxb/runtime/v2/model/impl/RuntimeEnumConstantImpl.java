@@ -17,10 +17,10 @@ import java.lang.reflect.Type;
 /**
  * @author Kohsuke Kawaguchi
  */
-final class RuntimeEnumConstantImpl extends EnumConstantImpl<Type,Class,Field,Method> {
+final class RuntimeEnumConstantImpl extends EnumConstantImpl<Type,Class,Field,Method,Object> {
     public RuntimeEnumConstantImpl(
         RuntimeEnumLeafInfoImpl owner, String name, String lexical,
-        EnumConstantImpl<Type,Class,Field,Method> next) {
+        EnumConstantImpl<Type,Class,Field,Method,Object> next) {
         super(owner, name, lexical, next);
     }
 }

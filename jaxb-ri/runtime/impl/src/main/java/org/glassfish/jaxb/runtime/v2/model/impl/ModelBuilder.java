@@ -43,17 +43,17 @@ import java.util.logging.Logger;
  *
  * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
+public class ModelBuilder<T,C,F,M,R> implements ModelBuilderI<T,C,F,M,R> {
     private static final Logger logger;
 
     /**
      * {@link TypeInfo}s that are built will go into this set.
      */
-    final TypeInfoSetImpl<T,C,F,M> typeInfoSet;
+    final TypeInfoSetImpl<T,C,F,M,R> typeInfoSet;
 
-    public final AnnotationReader<T,C,F,M> reader;
+    public final AnnotationReader<T,C,F,M,R> reader;
 
-    public final Navigator<T,C,F,M> nav;
+    public final Navigator<T,C,F,M,R> nav;
 
     /**
      * Used to detect collisions among global type names.
@@ -79,7 +79,7 @@ public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
     /**
      * Packages whose registries are already added.
      */
-    /*package*/ final Map<String,RegistryInfoImpl<T,C,F,M>> registries
+    /*package*/ final Map<String,RegistryInfoImpl<T,C,F,M,R>> registries
             = new HashMap<>();
 
     private final Map<C,C> subclassReplacements;
@@ -104,8 +104,8 @@ public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
     };
 
     public ModelBuilder(
-            AnnotationReader<T, C, F, M> reader,
-            Navigator<T, C, F, M> navigator,
+            AnnotationReader<T, C, F, M, R> reader,
+            Navigator<T, C, F, M, R> navigator,
             Map<C, C> subclassReplacements,
             String defaultNamespaceRemap
     ) {
@@ -117,7 +117,7 @@ public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
             defaultNamespaceRemap = "";
         this.defaultNsUri = defaultNamespaceRemap;
         reader.setErrorHandler(proxyErrorHandler);
-        typeInfoSet = (TypeInfoSetImpl<T, C, F, M>) createTypeInfoSet();
+        typeInfoSet = (TypeInfoSetImpl<T, C, F, M, R>) createTypeInfoSet();
     }
 
     /*
@@ -169,7 +169,7 @@ public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
         logger = Logger.getLogger(ModelBuilder.class.getName());
     }
 
-    protected TypeInfoSet<T,C,F,M> createTypeInfoSet() {
+    protected TypeInfoSet<T,C,F,M,R> createTypeInfoSet() {
         return new TypeInfoSetImpl<>(nav,reader,BuiltinLeafInfoImpl.createLeaves(nav));
     }
 
@@ -197,7 +197,7 @@ public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
             return r;
 
         if(nav.isEnum(clazz)) {
-            EnumLeafInfoImpl<T,C,F,M> li = (EnumLeafInfoImpl<T, C, F, M>) createEnumLeafInfo(clazz,upstream);
+            EnumLeafInfoImpl<T,C,F,M,R> li = (EnumLeafInfoImpl<T, C, F, M, R>) createEnumLeafInfo(clazz,upstream);
             typeInfoSet.add(li);
             r = li;
             addTypeName(r);
@@ -212,7 +212,7 @@ public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
                 r = getClassInfo( nav.getSuperClass(clazz), searchForSuperClass,
                         new ClassLocatable<>(upstream,clazz,nav) );
             } else {
-                ClassInfoImpl<T,C,F,M> ci = (ClassInfoImpl<T, C, F, M>) createClassInfo(clazz,upstream);
+                ClassInfoImpl<T,C,F,M,R> ci = (ClassInfoImpl<T, C, F, M, R>) createClassInfo(clazz,upstream);
                 typeInfoSet.add(ci);
 
                 // compute the closure by eagerly expanding references
@@ -321,7 +321,7 @@ public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
         if(r!=null)     return r;
 
         if(nav.isArray(t)) { // no need for checking byte[], because above typeInfoset.getTypeInfo() would return non-null
-            ArrayInfoImpl<T,C,F,M> ai = (ArrayInfoImpl<T, C, F, M>) createArrayInfo(upstream, t);
+            ArrayInfoImpl<T,C,F,M,R> ai = (ArrayInfoImpl<T, C, F, M, R>) createArrayInfo(upstream, t);
             addTypeName(ai);
             typeInfoSet.add(ai);
             return ai;
@@ -358,7 +358,7 @@ public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
 
     protected ElementInfo<T,C> createElementInfo(
             RegistryInfo<T,C> registryInfo, M m) throws IllegalAnnotationException {
-        return new ElementInfoImpl<>(this, (RegistryInfoImpl<T, C, F, M>) registryInfo,m);
+        return new ElementInfoImpl<>(this, (RegistryInfoImpl<T, C, F, M, R>) registryInfo,m);
     }
 
     protected ArrayInfo<T,C> createArrayInfo(Locatable upstream, T arrayType) {
@@ -399,7 +399,7 @@ public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
      *      fully built {@link TypeInfoSet} that represents the model,
      *      or null if there was an error.
      */
-    public TypeInfoSet<T,C,F,M> link() {
+    public TypeInfoSet<T,C,F,M,R> link() {
 
         assert !linked;
         linked = true;
@@ -446,12 +446,12 @@ public class ModelBuilder<T,C,F,M> implements ModelBuilderI<T,C,F,M> {
     }
 
     @Override
-    public Navigator<T, C, F, M> getNavigator() {
+    public Navigator<T, C, F, M, R> getNavigator() {
         return nav;
     }
 
     @Override
-    public AnnotationReader<T, C, F, M> getReader() {
+    public AnnotationReader<T, C, F, M, R> getReader() {
         return reader;
     }
 }

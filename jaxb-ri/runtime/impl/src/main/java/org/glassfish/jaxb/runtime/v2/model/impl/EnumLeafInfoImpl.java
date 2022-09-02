@@ -27,8 +27,8 @@ import java.util.Iterator;
  *
  * @author Kohsuke Kawaguchi
  */
-class EnumLeafInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
-        implements EnumLeafInfo<T,C>, Element<T,C>, Iterable<EnumConstantImpl<T,C,F,M>> {
+class EnumLeafInfoImpl<T,C,F,M,R> extends TypeInfoImpl<T,C,F,M,R>
+        implements EnumLeafInfo<T,C>, Element<T,C>, Iterable<EnumConstantImpl<T,C,F,M,R>> {
 
     /**
      * The enum class whose information this object represents.
@@ -47,7 +47,7 @@ class EnumLeafInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
     /**
      * All the {@link EnumConstantImpl}s are linked in this list.   
      */
-    private EnumConstantImpl<T,C,F,M> firstConstant;
+    private EnumConstantImpl<T,C,F,M,R> firstConstant;
 
     /**
      * If this enum is also bound to an element, that tag name.
@@ -66,7 +66,7 @@ class EnumLeafInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
      *      that this {@link EnumLeafInfo} represents.
      *      Because of the type parameterization we have to take them separately.
      */
-    public EnumLeafInfoImpl(ModelBuilder<T,C,F,M> builder,
+    public EnumLeafInfoImpl(ModelBuilder<T,C,F,M,R> builder,
                             Locatable upstream, C clazz, T type ) {
         super(builder,upstream);
         this.clazz = clazz;
@@ -93,7 +93,7 @@ class EnumLeafInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
      * Build {@link EnumConstant}s and discover/report any error in it.
      */
     protected void calcConstants() {
-        EnumConstantImpl<T,C,F,M> last = null;
+        EnumConstantImpl<T,C,F,M,R> last = null;
         
         // first check if we represent xs:token derived type
         Collection<? extends F> fields = nav().getDeclaredFields(clazz);
@@ -123,7 +123,7 @@ class EnumLeafInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
         this.firstConstant = last;
     }
 
-    protected EnumConstantImpl<T,C,F,M> createEnumConstant(String name, String literal, F constant, EnumConstantImpl<T,C,F,M> last) {
+    protected EnumConstantImpl<T,C,F,M,R> createEnumConstant(String name, String literal, F constant, EnumConstantImpl<T,C,F,M,R> last) {
         return new EnumConstantImpl<>(this, name, literal, last);
     }
 
@@ -179,7 +179,7 @@ class EnumLeafInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
     }
 
     @Override
-    public Iterable<? extends EnumConstantImpl<T,C,F,M>> getConstants() {
+    public Iterable<? extends EnumConstantImpl<T,C,F,M,R>> getConstants() {
         if(firstConstant==null)
             calcConstants();
         return this;
@@ -235,9 +235,9 @@ class EnumLeafInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
     }
 
     @Override
-    public Iterator<EnumConstantImpl<T,C,F,M>> iterator() {
+    public Iterator<EnumConstantImpl<T,C,F,M,R>> iterator() {
         return new Iterator<>() {
-            private EnumConstantImpl<T, C, F, M> next = firstConstant;
+            private EnumConstantImpl<T, C, F, M, R> next = firstConstant;
 
             @Override
             public boolean hasNext() {
@@ -245,8 +245,8 @@ class EnumLeafInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
             }
 
             @Override
-            public EnumConstantImpl<T, C, F, M> next() {
-                EnumConstantImpl<T, C, F, M> r = next;
+            public EnumConstantImpl<T, C, F, M, R> next() {
+                EnumConstantImpl<T, C, F, M, R> r = next;
                 next = next.next;
                 return r;
             }

@@ -17,6 +17,6 @@ import org.glassfish.jaxb.core.v2.model.core.PropertyInfo;
  *
  * @author Martin Grebac
  */
-public interface DummyPropertyInfo<T, C, F, M> {
+public interface DummyPropertyInfo<T, C, F, M, R> {
     void addType(PropertyInfo<T,C> info);
 }

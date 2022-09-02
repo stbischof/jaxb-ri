@@ -14,8 +14,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import com.sun.istack.Nullable;
 import org.glassfish.jaxb.core.v2.model.core.ErrorHandler;
+
+import com.sun.istack.Nullable;
 
 /**
  * Reads annotations for the given property.
@@ -46,7 +47,7 @@ import org.glassfish.jaxb.core.v2.model.core.ErrorHandler;
  *
  * @author Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public interface AnnotationReader<T,C,F,M> {
+public interface AnnotationReader<T,C,F,M,R> {
 
     /**
      * Sets the error handler that receives errors found
@@ -144,4 +145,16 @@ public interface AnnotationReader<T,C,F,M> {
      * obtains an array parameter.
      */
     T[] getClassArrayValue( Annotation a, String name );
+
+    
+	/**
+	 * Reads an annotation on a property that consists of a field.
+	 */
+	<A extends Annotation> A getRecordComponentAnnotation(Class<A> annotation, R r, Locatable srcpos);
+
+	Annotation[] getAllRecordComponentAnnotations(R recordComponent, Locatable srcPos);
+
+	boolean hasRecordComponentAnnotation(Class<? extends Annotation> annotationType, R rc);
+
+
 }

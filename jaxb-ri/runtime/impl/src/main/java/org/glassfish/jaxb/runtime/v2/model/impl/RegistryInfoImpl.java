@@ -28,14 +28,14 @@ import java.util.Set;
  *
  * @author Kohsuke Kawaguchi
  */
-// experimenting with shorter type parameters for <T,C,F,M> quadruple.
+// experimenting with shorter type parameters for <T,C,F,M,R> quadruple.
 // the idea is that they show so often that you'd understand the meaning
 // without relying on the whole name.
-final class RegistryInfoImpl<T,C,F,M> implements Locatable, RegistryInfo<T,C> {
+final class RegistryInfoImpl<T,C,F,M,R> implements Locatable, RegistryInfo<T,C> {
 
     final C registryClass;
     private final Locatable upstream;
-    private final Navigator<T,C,F,M> nav;
+    private final Navigator<T,C,F,M,R> nav;
 
     /**
      * Types that are referenced from this registry.
@@ -45,7 +45,7 @@ final class RegistryInfoImpl<T,C,F,M> implements Locatable, RegistryInfo<T,C> {
     /**
      * Picks up references in this registry to other types.
      */
-    RegistryInfoImpl(ModelBuilder<T,C,F,M> builder, Locatable upstream, C registryClass) {
+    RegistryInfoImpl(ModelBuilder<T,C,F,M,R> builder, Locatable upstream, C registryClass) {
         this.nav = builder.nav;
         this.registryClass = registryClass;
         this.upstream = upstream;
@@ -77,9 +77,9 @@ final class RegistryInfoImpl<T,C,F,M> implements Locatable, RegistryInfo<T,C> {
                 continue;
             }
 
-            ElementInfoImpl<T,C,F,M> ei;
+            ElementInfoImpl<T,C,F,M,R> ei;
             try {
-                ei = (ElementInfoImpl<T, C, F, M>) builder.createElementInfo(this,m);
+                ei = (ElementInfoImpl<T, C, F, M, R>) builder.createElementInfo(this,m);
             } catch (IllegalAnnotationException e) {
                 builder.reportError(e);
                 continue;   // recover by ignoring this element

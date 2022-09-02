@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sun.xml.bind.mvn</groupId>
+        <artifactId>jaxb-runtime-parent</artifactId>
+        <version>4.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    
+    <groupId>org.glassfish.jaxb</groupId>
+	<artifactId>record_test</artifactId>
+
+	<properties>
+		<java.version>17</java.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+        <spotbugs.exclude>${project.basedir}/exclude-runtime.xml</spotbugs.exclude>
+        <argLine>
+            --add-opens org.glassfish.jaxb.runtime/org.glassfish.jaxb.runtime.unmarshaller=jakarta.xml.bind
+            --add-opens org.glassfish.jaxb.runtime/org.glassfish.jaxb.runtime.v2=jakarta.xml.bind
+            --add-opens org.glassfish.jaxb.runtime/org.glassfish.jaxb.runtime.v2.runtime=jakarta.xml.bind
+            --add-opens org.glassfish.jaxb.runtime/org.glassfish.jaxb.runtime.v2=org.glassfish.jaxb.core
+            --add-opens org.glassfish.jaxb.runtime/org.glassfish.jaxb.runtime.v2.schemagen=org.glassfish.jaxb.core
+            --add-opens java.base/java.lang=org.glassfish.jaxb.runtime
+            --add-opens java.base/java.lang.reflect=org.glassfish.jaxb.runtime
+            --add-opens org.glassfish.jaxb.runtime/org.glassfish.jaxb.runtime.v2.runtime.reflect.opt=org.glassfish.jaxb.core
+            --add-opens org.glassfish.jaxb.runtime/org.glassfish.jaxb.runtime.test.record=jakarta.xml.bind
+        </argLine>
+	</properties>
+	
+	    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jvnet.staxex</groupId>
+            <artifactId>stax-ex</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

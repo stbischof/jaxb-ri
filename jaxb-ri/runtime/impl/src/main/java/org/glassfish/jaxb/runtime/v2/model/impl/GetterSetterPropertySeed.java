@@ -23,14 +23,14 @@ import java.lang.annotation.Annotation;
  * We allow the getter or setter to be null, in which case the bean
  * can only participate in unmarshalling (or marshalling)
  */
-class GetterSetterPropertySeed<TypeT,ClassDeclT,FieldT,MethodT> implements
-        PropertySeed<TypeT,ClassDeclT,FieldT,MethodT> {
+class GetterSetterPropertySeed<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> implements
+        PropertySeed<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> {
 
     protected final MethodT getter;
     protected final MethodT setter;
-    private ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT> parent;
+    private ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> parent;
 
-    GetterSetterPropertySeed(ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT> parent, MethodT getter, MethodT setter) {
+    GetterSetterPropertySeed(ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> parent, MethodT getter, MethodT setter) {
         this.parent = parent;
         this.getter = getter;
         this.setter = setter;

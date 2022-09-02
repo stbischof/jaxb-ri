@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Kohsuke Kawaguchi
  */
-class ElementInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M> implements ElementInfo<T,C> {
+class ElementInfoImpl<T,C,F,M,R> extends TypeInfoImpl<T,C,F,M,R> implements ElementInfo<T,C> {
 
     private final QName tagName;
 
@@ -55,14 +55,14 @@ class ElementInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M> implements ElementI
      * If this element can substitute another element, the element name.
      * @see #link()
      */
-    private ElementInfoImpl<T,C,F,M> substitutionHead;
+    private ElementInfoImpl<T,C,F,M,R> substitutionHead;
 
     /**
      * Lazily constructed list of {@link ElementInfo}s that can substitute this element.
      * This could be null.
      * @see #link()
      */
-    private FinalArrayList<ElementInfoImpl<T,C,F,M>> substitutionMembers;
+    private FinalArrayList<ElementInfoImpl<T,C,F,M,R>> substitutionMembers;
 
     /**
      * The factory method from which this mapping was created.
@@ -142,7 +142,7 @@ class ElementInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M> implements ElementI
         }
 
         @Override
-        public ElementInfoImpl<T,C,F,M> parent() {
+        public ElementInfoImpl<T,C,F,M,R> parent() {
             return ElementInfoImpl.this;
         }
 
@@ -229,8 +229,8 @@ class ElementInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M> implements ElementI
      * @param m
      *      The factory method on ObjectFactory that comes with {@link XmlElementDecl}.
      */
-    public ElementInfoImpl(ModelBuilder<T,C,F,M> builder,
-                           RegistryInfoImpl<T,C,F,M> registry, M m ) throws IllegalAnnotationException {
+    public ElementInfoImpl(ModelBuilder<T,C,F,M,R> builder,
+                           RegistryInfoImpl<T,C,F,M,R> registry, M m ) throws IllegalAnnotationException {
         super(builder,registry);
 
         this.method = m;
@@ -394,7 +394,7 @@ class ElementInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M> implements ElementI
     }
 
     @Override
-    public Collection<? extends ElementInfoImpl<T,C,F,M>> getSubstitutionMembers() {
+    public Collection<? extends ElementInfoImpl<T,C,F,M,R>> getSubstitutionMembers() {
         if(substitutionMembers==null)
             return Collections.emptyList();
         else
@@ -423,7 +423,7 @@ class ElementInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M> implements ElementI
         super.link();
     }
 
-    private void addSubstitutionMember(ElementInfoImpl<T,C,F,M> child) {
+    private void addSubstitutionMember(ElementInfoImpl<T,C,F,M,R> child) {
         if(substitutionMembers==null)
             substitutionMembers = new FinalArrayList<>();
         substitutionMembers.add(child);

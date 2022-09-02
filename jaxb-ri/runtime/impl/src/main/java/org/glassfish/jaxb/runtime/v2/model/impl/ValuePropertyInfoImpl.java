@@ -16,13 +16,13 @@ import org.glassfish.jaxb.core.v2.model.core.ValuePropertyInfo;
 /**
  * @author Kohsuke Kawaguchi
  */
-class ValuePropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
-    extends SingleTypePropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
+class ValuePropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT>
+    extends SingleTypePropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT>
     implements ValuePropertyInfo<TypeT,ClassDeclT> {
 
     ValuePropertyInfoImpl(
-        ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT> parent,
-        PropertySeed<TypeT,ClassDeclT,FieldT,MethodT> seed) {
+        ClassInfoImpl<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> parent,
+        PropertySeed<TypeT,ClassDeclT,FieldT,MethodT,RecordComponentT> seed) {
 
         super(parent,seed);
     }

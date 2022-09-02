@@ -67,7 +67,7 @@ import static org.glassfish.jaxb.runtime.v2.schemagen.Util.*;
  * @author Ryan Shoemaker
  * @author Kohsuke Kawaguchi (kk@kohsuke.org)
  */
-public final class XmlSchemaGenerator<T,C,F,M> {
+public final class XmlSchemaGenerator<T,C,F,M,R> {
 
     private static final Logger logger = Utils.getClassLogger();
 
@@ -88,9 +88,9 @@ public final class XmlSchemaGenerator<T,C,F,M> {
     private ErrorListener errorListener;
 
     /** model navigator **/
-    private Navigator<T,C,F,M> navigator;
+    private Navigator<T,C,F,M,R> navigator;
 
-    private final TypeInfoSet<T,C,F,M> types;
+    private final TypeInfoSet<T,C,F,M,R> types;
 
     /**
      * Representation for xs:string.
@@ -107,7 +107,7 @@ public final class XmlSchemaGenerator<T,C,F,M> {
      */
     private final CollisionCheckStack<ClassInfo<T,C>> collisionChecker = new CollisionCheckStack<>();
 
-    public XmlSchemaGenerator( Navigator<T,C,F,M> navigator, TypeInfoSet<T,C,F,M> types ) {
+    public XmlSchemaGenerator( Navigator<T,C,F,M,R> navigator, TypeInfoSet<T,C,F,M,R> types ) {
         this.navigator = navigator;
         this.types = types;
 
